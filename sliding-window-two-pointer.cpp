@@ -753,6 +753,68 @@ int longestOnesOptimal(std::vector<int> &nums, int k)
 }
 
 /*
+**.  Fruits and Baskets
+ANS : There are ‘n’ fruit trees that are planted along a road. The trees are numbered from 0 to n-1. The type of fruit each tree bears is represented by an integer from 1 to 'n'.
+A Ninja is walking along that road. He has two baskets and wants to put the maximum number of fruits in them. The restriction is that each basket can have only one type of fruit.
+Ninja can start with any tree and end at any tree, but once he has started, he cannot skip a tree i.e if he picks fruit from the tree ‘i’, then he has to pick fruit from tree ‘i+1’ before going to the tree ‘i+2’. He will pick one fruit from each tree until he cannot, i.e, he will stop when he has to pick a fruit of the third type because only two different fruits can fill both baskets.
+You are given an array ‘arr’. The ‘i’th integer in this array represents the type of fruit tree ‘i’ bears. Return the maximum number of fruits Ninja can put in both baskets after satisfying all the conditions.
+Input :  'arr' = [1, 2, 3], k = 2  || Output :2
+*/
+// Bruteforce ----------->
+// TC :
+// SC :
+// Better ----------->
+// TC :
+// SC :
+// Optimal ---------->
+// TC : O(N)
+// SC :O(N)
+int findMaxFruits(vector<int> &s, int n)
+{
+    // Write your code here.
+    int i = 0, j = 0;
+    int k = 2; // we need 2 types fruit so
+    int maxi = INT_MIN;
+    map<int, int> mpp;
+    while (j < n)
+    {
+        // 1st step-- >>
+        // calculation
+        mpp[s[j]]++;
+        // 2nd step-- -- >>
+        // condition is not given so think it if (condition < k)
+        if (mpp.size() < k)
+        {
+            j++;
+        }
+        // 3rd step-- -- >>
+        //     if (condition == k)
+        else if (mpp.size() == k)
+        {
+            // ans calculation.
+            maxi = max(maxi, j - i + 1);
+            j++;
+        }
+        // 4th step-- --->>
+        //     else if (condition > k)
+        else if (mpp.size() > k)
+
+        {
+            while (mpp.size() > k)
+            {
+                // remove calculation for i
+                mpp[s[i]]--;
+                if (mpp[s[i]] == 0)
+                    mpp.erase(s[i]);
+                i++;
+            }
+            j++;
+        }
+    }
+    return maxi;
+}
+
+/*
 11. Longest Repeating Character Replacement
 ANS : You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
 Return the length of the longest substring containing the same letter you can get after performing the above operations.
@@ -1320,8 +1382,8 @@ The testcases will be generated such that the answer is unique.
 Input :   || Output :
 */
 // Bruteforce ----------->
-// TC :
-// SC :
+// TC : O(N^3)
+// SC :O(N)
 string minWindowBruteforce(const string &s, const string &t)
 {
     int m = s.length();
@@ -1369,8 +1431,8 @@ string minWindowBruteforce(const string &s, const string &t)
     return result;
 }
 // Better ----------->
-// TC :
-// SC :
+// TC : O(N)
+// SC :O(M)
 string minWindowBetter(const string &s, const string &t)
 {
     int m = s.length();
@@ -1503,7 +1565,7 @@ Input :   || Output :
 // TC :
 // SC :
 // Optimal ---------->
-// Time Complexity: O( N * N )
+// Time Complexity: O( N )
 // Space Complexity: O( 1 )
 
 string minWindow(string S, string T)
