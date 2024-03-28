@@ -5,6 +5,17 @@
 #include <limits>
 #include <vector>
 using namespace std;
+typedef vector<int> VI;
+typedef vector<vector<int>> VVI;
+typedef vector<string> VS;
+#define PB push_back
+#define SZ(x) ((int)x.size())
+#define LEN(x) ((int)x.length())
+#define REV(x) reverse(x.begin(), x.end());
+#define trav(a, x) for (auto &a : x)
+#define FOR(i, n) for (int i = 0; i < n; i++)
+#define FOR1(i, n) for (int i = 1; i <= n; i++)
+#define SORT(x) sort(x.begin(), x.end())
 
 // Short function start-->>
 void printArray(int arr[], int length)
@@ -38,7 +49,7 @@ void printVectorVector(vector<vector<int>> x)
             cout << element << " ";
         }
         cout << "]";
-        cout << std::endl;
+        cout << endl;
     }
 }
 void printVectorVectorString(vector<vector<string>> x)
@@ -51,7 +62,7 @@ void printVectorVectorString(vector<vector<string>> x)
             cout << element << " ";
         }
         cout << "]";
-        cout << std::endl;
+        cout << endl;
     }
 }
 void printString(string s, int length)
@@ -447,14 +458,14 @@ Input : s = "abcabcbb"  || Output :3
 // SC :O(n)
 int lengthOfLongestSubstringBruteforce(string str)
 {
-
-    if (str.size() == 0)
+    int n = LEN(str);
+    if (n == 0)
         return 0;
     int maxans = INT_MIN;
-    for (int i = 0; i < str.length(); i++) // outer loop for traversing the string
+    for (int i = 0; i < n; i++) // outer loop for traversing the string
     {
-        unordered_set<int> set;
-        for (int j = i; j < str.length(); j++) // nested loop for getting different string starting with str[i]
+        unordered_set<int> set;     // or you can use here hash[256]={0}; next is same checking if it exist then break else max it then save curr one if you do this then space O(256)
+        for (int j = i; j < n; j++) // nested loop for getting different string starting with str[i]
         {
             if (set.find(str[j]) != set.end()) // if element if found so mark it as ans and break from the loop
             {
@@ -468,13 +479,15 @@ int lengthOfLongestSubstringBruteforce(string str)
 }
 // Better ----------->
 // Time Complexity: O(N)
-// Space Complexity: O(N)
+// Space Complexity: O(N) or if you used hash then its O(256)
 int lengthofLongestSubstringBetter(string s)
 {
     vector<int> mpp(256, -1);
+    // int hash[256] = {0};
+    // int *mpp = new int[256]();
 
     int left = 0, right = 0;
-    int n = s.size();
+    int n = SZ(s);
     int len = 0;
     while (right < n)
     {
@@ -694,7 +707,7 @@ Input : nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2  || Output :6
 // Bruteforce ----------->
 // TC : O(N^2)
 // SC :
-int longestOnesBruteforce(std::vector<int> &nums, int k)
+int longestOnesBruteforce(vector<int> &nums, int k)
 {
     int maxOnes = 0;
     for (int i = 0; i < nums.size(); ++i)
@@ -705,15 +718,11 @@ int longestOnesBruteforce(std::vector<int> &nums, int k)
             if (nums[j] == 0)
             {
                 if (flipCount < k)
-                {
                     flipCount++;
-                }
                 else
-                {
                     break; // Cannot flip more 0's, exit the inner loop
-                }
             }
-            maxOnes = std::max(maxOnes, j - i + 1);
+            maxOnes = max(maxOnes, j - i + 1);
         }
     }
     return maxOnes;
@@ -725,7 +734,7 @@ int longestOnesBruteforce(std::vector<int> &nums, int k)
 // Optimal ---------->
 // TC : O(N)
 // SC :O(1)
-int longestOnesOptimal(std::vector<int> &nums, int k)
+int longestOnesOptimal(vector<int> &nums, int k)
 {
     int left = 0, right = 0, zeroCount = 0, maxOnes = 0;
 
@@ -736,7 +745,7 @@ int longestOnesOptimal(std::vector<int> &nums, int k)
             zeroCount++;
         }
 
-        while (zeroCount > k)
+        if (zeroCount > k) // You remove while from here
         {
             if (nums[left] == 0)
             {
@@ -744,8 +753,8 @@ int longestOnesOptimal(std::vector<int> &nums, int k)
             }
             left++;
         }
-
-        maxOnes = std::max(maxOnes, right - left + 1);
+        if (zeroCount <= k)
+            maxOnes = max(maxOnes, right - left + 1);
         right++;
     }
 
@@ -761,15 +770,30 @@ You are given an array ‘arr’. The ‘i’th integer in this array represents
 Input :  'arr' = [1, 2, 3], k = 2  || Output :2
 */
 // Bruteforce ----------->
-// TC :
-// SC :
+// TC :O(NxN)
+// SC :O(log3)=O(1) log3 bcz we at max want to insert <=2 types of fruits
+int findMaxFruitsBruteforce(vector<int> &s, int n)
+{
+    int maxLen = 0;
+    FOR(i, n)
+    {
+        set<int> st;
+        for (int j = i; j < n; j++)
+        {
+            st.insert(s[j]);
+            if (SZ(st) <= 2)
+                maxLen = max(maxLen, j - i + 1);
+            else
+                break;
+        }
+    }
+    return maxLen;
+}
+
 // Better ----------->
-// TC :
-// SC :
-// Optimal ---------->
-// TC : O(N)
+// TC : O(NxN) in worst case internal while loop can go till n
 // SC :O(N)
-int findMaxFruits(vector<int> &s, int n)
+int findMaxFruitsBetter(vector<int> &s, int n)
 {
     // Write your code here.
     int i = 0, j = 0;
@@ -813,7 +837,41 @@ int findMaxFruits(vector<int> &s, int n)
     }
     return maxi;
 }
+// Optimal ---------->
+// TC :O(N)
+// SC :O(N)
+int findMaxFruitsOptimal(vector<int> &s, int n)
+{
+    // Write your code here.
+    int i = 0, j = 0;
+    int k = 2; // we need 2 types fruit so
+    int maxi = INT_MIN;
+    map<int, int> mpp;
+    while (j < n)
+    {
+        // 1st step-- >>
+        // calculation
+        mpp[s[j]]++;
+        // 2nd step-- -- >>
+        //  if (condition > k)
+        if (mpp.size() > k)
+        {
+            // remove calculation for i
+            mpp[s[i]]--;
+            if (mpp[s[i]] == 0)
+                mpp.erase(s[i]);
+            i++;
+        }
 
+        // 3rd step-- --->>
+        // condition is not given so think it if (condition < k)
+        if (mpp.size() <= k)
+            // ans calculation.
+            maxi = max(maxi, j - i + 1);
+        j++;
+    }
+    return maxi;
+}
 /*
 11. Longest Repeating Character Replacement
 ANS : You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
@@ -925,7 +983,7 @@ int numSubarraysWithSumBetter(vector<int> &nums, int goal)
     // Better
     int count = 0;
     int sum = 0;
-    std::unordered_map<int, int> prefixSumCount;
+    unordered_map<int, int> prefixSumCount;
     prefixSumCount[0] = 1;
 
     for (int num : nums)
@@ -1041,7 +1099,7 @@ int numberOfSubarraysBetter(vector<int> &nums, int k)
 int numberOfSubarraysOptimal(vector<int> &nums, int k)
 {
     int n = nums.size();
-    std::unordered_map<int, int> prefixSumCount;
+    unordered_map<int, int> prefixSumCount;
     prefixSumCount[0] = 1;
     int sum = 0;
     int result = 0;
@@ -1131,7 +1189,7 @@ int numberOfSubstringsBetter(string s)
 
         if (aPointer != -1 && bPointer != -1 && cPointer != -1)
         {
-            count += (std::min({aPointer, bPointer, cPointer}) + 1);
+            count += (min({aPointer, bPointer, cPointer}) + 1);
         }
     }
 
@@ -1240,8 +1298,25 @@ int maxScoreBetter(vector<int> &cardPoints, int k)
     return total_sum - min_sum;
 }
 // Optimal ---------->
-// TC :
+// TC :O(2xK)
 // SC :
+int maxScoreOptimal(vector<int> &nums, int k)
+{
+    int n = SZ(nums);
+    int lsum = 0, rsum = 0, maxSum = 0;
+    for (int i = 0; i <= k - 1; i++)
+        lsum += nums[i];
+    maxSum = lsum;
+    int rIndex = n - 1;
+    for (int i = k - 1; i >= 0; i--)
+    {
+        lsum -= nums[i];
+        rsum += nums[rIndex];
+        rIndex--;
+        maxSum = max(maxSum, lsum + rsum);
+    }
+    return maxSum;
+}
 
 /*
 16. Longest Substring with At Most K Distinct Characters
@@ -1250,7 +1325,7 @@ Input : 'str’ = ‘abbbbbbc’ and ‘K’ = 2,  || Output :7
 */
 // Bruteforce ----------->
 // TC : O(n^3)
-// SC :
+// SC : O(n * k) either O(K)
 int kDistinctCharsBruteforce(int k, string &s)
 {
 
@@ -1269,10 +1344,31 @@ int kDistinctCharsBruteforce(int k, string &s)
     }
     return maxLength;
 }
-// Better ----------->
-// TC :O(n)
-// SC : O(min(n, k))
+// Better ---------->
+// TC :O(N^2)
+// SC :O(K)
 int kDistinctCharsBetter(int k, string &s)
+{
+    int n = SZ(s);
+    int maxLen = 0;
+    FOR(i, n)
+    {
+        unordered_map<char, int> mpp;
+        for (int j = i; j < n; j++)
+        {
+            mpp[s[j]]++;
+            if (SZ(mpp) <= k)
+                maxLen = max(maxLen, j - i + 1);
+            else
+                break;
+        }
+    }
+    return maxLen;
+}
+// Optimal ----------->
+// TC :O(n)+O(N) in worst case+O(256)
+// SC : O(256)
+int kDistinctCharsOptimal(int k, string &s)
 {
     int maxLength = 0;
     int left = 0, right = 0;
@@ -1286,9 +1382,7 @@ int kDistinctCharsBetter(int k, string &s)
         {
             charCount[s[left]]--;
             if (charCount[s[left]] == 0)
-            {
                 charCount.erase(s[left]);
-            }
             left++;
         }
 
@@ -1298,10 +1392,33 @@ int kDistinctCharsBetter(int k, string &s)
 
     return maxLength;
 }
-
-// Optimal ---------->
+// Optimal's optimal ---------->
 // TC :
 // SC :
+int kDistinctCharsOptimalsOptimal(int k, string &s)
+{
+    int maxLength = 0;
+    int left = 0, right = 0;
+    unordered_map<char, int> charCount;
+
+    while (right < s.length())
+    {
+        charCount[s[right]]++;
+
+        if (charCount.size() > k)
+        {
+            charCount[s[left]]--;
+            if (charCount[s[left]] == 0)
+                charCount.erase(s[left]);
+            left++;
+        }
+
+        maxLength = max(maxLength, right - left + 1);
+        right++;
+    }
+
+    return maxLength;
+}
 
 /*
 17. Subarrays with K Different Integers
@@ -1568,7 +1685,7 @@ Input :   || Output :
 // Time Complexity: O( N )
 // Space Complexity: O( 1 )
 
-string minWindow(string S, string T)
+string minwindow(string S, string T)
 {
     // Initially our window is empty
     string window = "";
@@ -1658,21 +1775,36 @@ int main()
     // string text = "forxxorfxdofr";
     // string word = "for";
     // cout << countAnagrams(text, word) << endl;
-    // vector<int> arr = {4, 1, 1, 1, 2, 3, 5};
+    vector<int> arr = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
+    // cout << "Max consecutive is " << longestOnesBruteforce(arr, 2) << endl;
+    // cout << "Max consecutive is " << longestOnesOptimal(arr, 2) << endl;
+    // cout << "Maximum number of fruits is " << findMaxFruitsBruteforce(arr, SZ(arr)) << endl;
+    // cout << "Maximum number of fruits is " << findMaxFruitsBetter(arr, SZ(arr)) << endl;
+    // cout << "Maximum number of fruits is " << findMaxFruitsOptimal(arr, SZ(arr));
+    string s = "aaabbccd";
+    cout << "The length is " << kDistinctCharsBetter(2, s) << endl;
+    cout << "The length is " << kDistinctCharsBruteforce(2, s) << endl;
+    cout << "The length is " << kDistinctCharsOptimal(2, s) << endl;
+    cout << "The length is " << kDistinctCharsOptimalsOptimal(2, s) << endl;
+
+    // cout << "Max point is " << maxScoreOptimal(arr, 3);
     // vector<int> ans = maxSlidingWindow(arr, 3);
     // printVector(ans);
-    // cout << "Max is : " << maxSubarrayLength(arr, 5);
+    // cout << "Max is : " << maxSubarrayLength(arr, 14);
     // string S = "aabacbebebe";
     // cout << "Longest " << longestKSubstr(S, 3);
     // string s = "abcabcbb";
     // cout << lengthOfLongestSubstringBruteforce(s);
+    // cout << endl;
+    // cout << lengthofLongestSubstringBetter(s);
+    // cout << endl;
     // cout << lengthOfLongestSubstringOptimal(s);
     // cout<<toysPicked(s);
-    // cout << minWindow("ADOBECODEBANC", "ABC");
-    vector<int> arr = {1, 2, 1, 2, 3};
-    cout << "Subarray is " << subarraysWithKDistinctBruteforce(arr, 2);
-    cout << endl;
-    cout << "Subarray is " << subarraysWithKDistincOptimal(arr, 2);
+    // cout << minwindow("ADOBECODEBANC", "ABC");
+    // vector<int> arr = {1, 2, 1, 2, 3};
+    // cout << "Subarray is " << subarraysWithKDistinctBruteforce(arr, 2);
+    // cout << endl;
+    // cout << "Subarray is " << subarraysWithKDistincOptimal(arr, 2);
 
     // End code here-------->>
 
