@@ -1165,9 +1165,34 @@ int numberOfSubstringsBruteforce(string s)
     return count;
 }
 // Better ----------->
+// TC : O(n^2)
+// SC :O(1)
+int numberOfSubstringsBetter(string s)
+{
+    int cnt = 0;
+    int n = SZ(s);
+    FOR(i, n)
+    {
+        int *hash = new int[3]();
+        for (int j = i; j < n; j++)
+        {
+            hash[s[j] - 'a'] = 1;
+            if (hash[0] + hash[1] + hash[2] == 3)
+            {
+
+                // cnt++;
+                // Li'll optimisation
+                cnt += n - j;
+                break;
+            }
+        }
+    }
+    return cnt;
+}
+// Better's Better ----------->
 // TC : O(n)
 // SC :
-int numberOfSubstringsBetter(string s)
+int numberOfSubstringsBettersBetter(string s)
 {
     int count = 0;
     int aPointer = -1, bPointer = -1, cPointer = -1;
@@ -1197,26 +1222,29 @@ int numberOfSubstringsBetter(string s)
 }
 // Optimal ---------->
 // TC : O(n)
-// SC :
+// SC : we're saving 3 so its constant
 int numberOfSubstringsOptimal(string s)
 {
     int count = 0;
     vector<int> lastIndex(3, -1); // 0: 'a', 1: 'b', 2: 'c'
+    int n = SZ(s);
 
-    for (int i = 0; i < s.length(); ++i)
+    FOR(i, n)
     {
-        if (s[i] == 'a')
-        {
-            lastIndex[0] = i;
-        }
-        else if (s[i] == 'b')
-        {
-            lastIndex[1] = i;
-        }
-        else if (s[i] == 'c')
-        {
-            lastIndex[2] = i;
-        }
+        // if (s[i] == 'a')
+        // {
+        //     lastIndex[0] = i;
+        // }
+        // else if (s[i] == 'b')
+        // {
+        //     lastIndex[1] = i;
+        // }
+        // else if (s[i] == 'c')
+        // {
+        //     lastIndex[2] = i;
+        // }
+        // Instedof if else you can use
+        lastIndex[s[i] - 'a'] = i;
 
         if (lastIndex[0] != -1 && lastIndex[1] != -1 &&
             lastIndex[2] != -1)
@@ -1781,11 +1809,15 @@ int main()
     // cout << "Maximum number of fruits is " << findMaxFruitsBruteforce(arr, SZ(arr)) << endl;
     // cout << "Maximum number of fruits is " << findMaxFruitsBetter(arr, SZ(arr)) << endl;
     // cout << "Maximum number of fruits is " << findMaxFruitsOptimal(arr, SZ(arr));
-    string s = "aaabbccd";
-    cout << "The length is " << kDistinctCharsBetter(2, s) << endl;
-    cout << "The length is " << kDistinctCharsBruteforce(2, s) << endl;
-    cout << "The length is " << kDistinctCharsOptimal(2, s) << endl;
-    cout << "The length is " << kDistinctCharsOptimalsOptimal(2, s) << endl;
+    string s = "bbacba";
+    // cout << "The length is " << kDistinctCharsBetter(2, s) << endl;
+    // cout << "The length is " << kDistinctCharsBruteforce(2, s) << endl;
+    // cout << "The length is " << kDistinctCharsOptimal(2, s) << endl;
+    // cout << "The length is " << kDistinctCharsOptimalsOptimal(2, s) << endl;
+    cout << "Total no of subs-s " << numberOfSubstringsBruteforce(s) << endl;
+    cout << "Total no of subs-s " << numberOfSubstringsBetter(s) << endl;
+    cout << "Total no of subs-s " << numberOfSubstringsBettersBetter(s) << endl;
+    cout << "Total no of subs-s " << numberOfSubstringsOptimal(s) << endl;
 
     // cout << "Max point is " << maxScoreOptimal(arr, 3);
     // vector<int> ans = maxSlidingWindow(arr, 3);
