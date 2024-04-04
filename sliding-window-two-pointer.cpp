@@ -14,6 +14,7 @@ typedef vector<string> VS;
 #define REV(x) reverse(x.begin(), x.end());
 #define trav(a, x) for (auto &a : x)
 #define FOR(i, n) for (int i = 0; i < n; i++)
+#define FOR_INNER(j, i, n) for (int j = i; j < n; j++)
 #define FOR1(i, n) for (int i = 1; i <= n; i++)
 #define SORT(x) sort(x.begin(), x.end())
 
@@ -914,8 +915,30 @@ int characterReplacementBruteforce(string s, int k)
 }
 
 // Better ----------->
-// TC :
-// SC :
+// TC :O(N^2)
+// SC :O(26)
+int characterReplacementBetter(string s, int k)
+{
+    int n = SZ(s);
+    int maxlen = 0;
+    FOR(i, n)
+    {
+        int *hash = new int[26]();
+        int maxF = 0;
+        FOR_INNER(j, i, n)
+        {
+            hash[s[j] - 'a']++;
+            maxF = max(maxF, hash[s[i]]);
+            int changes = (j - i + 1) - maxF;
+            if (changes <= k)
+                maxlen = max(maxlen, j - i + 1);
+            else
+                break;
+        }
+    }
+    return maxlen;
+}
+
 // Optimal ---------->
 // TC : O(N)
 // SC : O(26) or O(1)
@@ -925,22 +948,20 @@ int characterReplacementOptimal(string s, int k)
     int ans = 0;
     int left = 0;
     int right = 0;
-    int maxf = 0;
+    int maxf = INT_MIN;
 
     for (right = 0; right < s.size(); right++)
     {
-        alphabets[s[right]] = 1 + alphabets[s[right]];
+        alphabets[s[right]] = alphabets[s[right]]++;
         maxf = max(maxf, alphabets[s[right]]);
 
         if ((right - left + 1) - maxf > k)
         {
-            alphabets[s[left]] -= 1;
+            alphabets[s[left]]--;
             left++;
         }
         else
-        {
             ans = max(ans, (right - left + 1));
-        }
     }
 
     return ans;
@@ -1480,39 +1501,57 @@ int subarraysWithKDistinctBruteforce(vector<int> &nums, int k)
     return goodSubarrays;
 }
 // Better ----------->
-// TC :
-// SC :
+// TC :O(N^2)
+// SC :O(N)
+int subarraysWithKDistinctBetter(vector<int> &nums, int k)
+{
+    int n = SZ(nums);
+    int count = 0;
+    FOR(i, n)
+    {
+        unordered_map<int, int> freq;
+        int distinctCount = 0;
+        FOR_INNER(j, i, n)
+        {
+            if (freq[nums[j]] == 0)
+                ++distinctCount;
+            ++freq[nums[j]];
+            if (distinctCount == k)
+                ++count;
+            if (distinctCount > k)
+                break;
+        }
+    }
+    return count;
+}
 // Optimal ---------->
-// TC :O(n)
-// SC :O(k)
+// TC :O(2n)
+// SC :O(n)
 int atMostKDistinct(vector<int> &nums, int k)
 {
-    int n = nums.size();
-    unordered_map<int, int> frequency;
-    int count = 0, left = 0;
+    int left = 0, right = 0;
+    map<int, int> map;
+    int cnt = 0;
 
-    for (int right = 0; right < n; ++right)
+    while (right < nums.size())
     {
-        if (frequency[nums[right]] == 0)
-        {
-            k--; // Decrement k only when encountering a new distinct element.
-        }
-        frequency[nums[right]]++;
+        map[nums[right]]++;
 
-        while (k < 0)
+        while (map.size() > k)
         {
-            frequency[nums[left]]--;
-            if (frequency[nums[left]] == 0)
-            {
-                k++; // Increment k only when removing the last occurrence of a distinct element.
-            }
+            map[nums[left]]--;
+
+            if (map[nums[left]] == 0)
+                map.erase(nums[left]);
+
             left++;
         }
 
-        count += right - left + 1;
+        cnt += right - left + 1;
+        right++;
     }
 
-    return count;
+    return cnt;
 }
 int subarraysWithKDistincOptimal(vector<int> &nums, int k)
 {
@@ -1803,21 +1842,21 @@ int main()
     // string text = "forxxorfxdofr";
     // string word = "for";
     // cout << countAnagrams(text, word) << endl;
-    vector<int> arr = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
+    // vector<int> arr = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
     // cout << "Max consecutive is " << longestOnesBruteforce(arr, 2) << endl;
     // cout << "Max consecutive is " << longestOnesOptimal(arr, 2) << endl;
     // cout << "Maximum number of fruits is " << findMaxFruitsBruteforce(arr, SZ(arr)) << endl;
     // cout << "Maximum number of fruits is " << findMaxFruitsBetter(arr, SZ(arr)) << endl;
     // cout << "Maximum number of fruits is " << findMaxFruitsOptimal(arr, SZ(arr));
-    string s = "bbacba";
+    // string s = "bbacba";
     // cout << "The length is " << kDistinctCharsBetter(2, s) << endl;
     // cout << "The length is " << kDistinctCharsBruteforce(2, s) << endl;
     // cout << "The length is " << kDistinctCharsOptimal(2, s) << endl;
     // cout << "The length is " << kDistinctCharsOptimalsOptimal(2, s) << endl;
-    cout << "Total no of subs-s " << numberOfSubstringsBruteforce(s) << endl;
-    cout << "Total no of subs-s " << numberOfSubstringsBetter(s) << endl;
-    cout << "Total no of subs-s " << numberOfSubstringsBettersBetter(s) << endl;
-    cout << "Total no of subs-s " << numberOfSubstringsOptimal(s) << endl;
+    // cout << "Total no of subs-s " << numberOfSubstringsBruteforce(s) << endl;
+    // cout << "Total no of subs-s " << numberOfSubstringsBetter(s) << endl;
+    // cout << "Total no of subs-s " << numberOfSubstringsBettersBetter(s) << endl;
+    // cout << "Total no of subs-s " << numberOfSubstringsOptimal(s) << endl;
 
     // cout << "Max point is " << maxScoreOptimal(arr, 3);
     // vector<int> ans = maxSlidingWindow(arr, 3);
@@ -1833,11 +1872,21 @@ int main()
     // cout << lengthOfLongestSubstringOptimal(s);
     // cout<<toysPicked(s);
     // cout << minwindow("ADOBECODEBANC", "ABC");
-    // vector<int> arr = {1, 2, 1, 2, 3};
+    // vector<int> arr = {1, 2, 1, 3, 4};
     // cout << "Subarray is " << subarraysWithKDistinctBruteforce(arr, 2);
     // cout << endl;
+    // cout << "Subarray is " << subarraysWithKDistinctBetter(arr, 2);
+    // cout << endl;
     // cout << "Subarray is " << subarraysWithKDistincOptimal(arr, 2);
+    // cout << "Longest substring is " << characterReplacementBruteforce(s, 2) << endl;
+    // cout << "Longest substring is " << characterReplacementBetter(s, 2) << endl;
 
+    // cout << "Longest substring is " << characterReplacementOptimal(s, 2);
+    string s = "ddaaabbca";
+    string t = "abc";
+    cout << "Minimum window bruteforce = " << minWindowBruteforce(s, t) << endl;
+    cout << "Minimum window bruteforce = " << minWindowBetter(s, t) << endl;
+    cout << "Minimum window bruteforce = " << minWindowOptimal(s, t) << endl;
     // End code here-------->>
 
     return 0;
