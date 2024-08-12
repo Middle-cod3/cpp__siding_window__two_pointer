@@ -88,7 +88,7 @@ void printStack(stack<string> s)
 
 Li'll Interoduction----->>>
 1️⃣ How to define its sliding window?
--->> Input given array or string and output related to subarray or substring along with can be attach largest,maximum or minimum and K that is window size.
+-->> Input given array or string and output related to subarray or sub string along with can be attach largest,maximum or minimum and K that is window size.
 If all this actions are there then it can be solve using sliding window.
 2️⃣ Types of sliding window?
 --->> 1) Fixed size window : You are given window size like K
@@ -478,15 +478,20 @@ int lengthOfLongestSubstringBruteforce(string str)
     }
     return maxans;
 }
+/*
+Why Unordered_set?
+An unordered_set is an ideal choice for this problem due to the following reasons:
+
+Fast Insertion and Lookup: Unordered sets are implemented using hash tables, which provide average constant time complexity for insertion and lookup operations. This is crucial for efficiently checking if a character has already appeared in the substring.
+Uniqueness: Unordered sets store only unique elements. This perfectly aligns with the problem's requirement of finding non-repeating characters.
+No Ordering Requirement: We don't need to maintain any specific order of characters in this problem, so an unordered set is suitable.
+*/
 // Better ----------->
 // Time Complexity: O(N)
 // Space Complexity: O(N) or if you used hash then its O(256)
 int lengthofLongestSubstringBetter(string s)
 {
     vector<int> mpp(256, -1);
-    // int hash[256] = {0};
-    // int *mpp = new int[256]();
-
     int left = 0, right = 0;
     int n = SZ(s);
     int len = 0;
@@ -547,6 +552,32 @@ int lengthOfLongestSubstringOptimal(string s)
         }
     }
     return maxi;
+}
+// Most optimal :
+int lengthOfLongestSubstringOptimal(string str)
+{
+    int n = SZ(str);
+    int left = 0, right = 0;
+    int maxLen = 0;
+    unordered_map<char, int> mpp;
+
+    while (right < n)
+    {
+        mpp[str[right]]++;
+
+        while (mpp[str[right]] > 1)
+        {
+            mpp[str[left]]--;
+            left++;
+        }
+
+        maxLen = max(maxLen, right - left + 1);
+        if (maxLen == n - left)
+        {
+            break; // Early termination
+        }
+        right++;
+    }
 }
 
 /*
@@ -882,6 +913,18 @@ Input :  s = "ABAB", k = 2 || Output : 4
 // Bruteforce ----------->
 // TC :O(N^3)
 // SC :
+/*
+Algo : 1.Initialize maxLen to 0.
+2.For each position i in the string:
+3. For each uppercase letter c from 'A' to 'Z':
+4. Initialize changes and len to 0.
+5. Starting from position i, iterate through the string:
+6. If the current character doesn't match c, increment changes.
+7. If changes exceeds k, break the inner loop.
+8. Increment len.
+9. Update maxLen if len is greater.
+Return maxLen.
+*/
 int characterReplacementBruteforce(string s, int k)
 {
     int maxLen = 0;
@@ -917,6 +960,20 @@ int characterReplacementBruteforce(string s, int k)
 // Better ----------->
 // TC :O(N^2)
 // SC :O(26)
+/*
+Algo : 1.Initialize maxlen to 0.
+2.For each position i in the string:
+3. Create a frequency array 'hash' for 26 lowercase letters.
+4. Initialize maxF (maximum frequency) to 0.
+5. For each position j from i to the end of the string:
+6. Increment the frequency of the current character in 'hash'.
+7. Update maxF to be the maximum of current maxF and the frequency of the character at position i.
+8. Calculate 'changes' as (current substring length) - maxF.
+9. If changes <= k:
+10. Update maxlen if the current substring length is greater.
+11. Else: break the inner loop.
+Return maxlen.
+*/
 int characterReplacementBetter(string s, int k)
 {
     int n = SZ(s);
@@ -942,6 +999,17 @@ int characterReplacementBetter(string s, int k)
 // Optimal ---------->
 // TC : O(N)
 // SC : O(26) or O(1)
+/*Algo :1.Initialize an unordered map 'alphabets' to store character frequencies.
+2.Initialize ans (maximum length), left (window start), right (window end), and maxf (maximum frequency) to 0.
+For each position right in the string:
+4. Increment the frequency of s[right] in 'alphabets'.
+5. Update maxf to be the maximum of current maxf and the frequency of s[right].
+6. If (current window size - maxf) > k:
+7. Decrement the frequency of s[left] in 'alphabets'.
+8. Increment left (shrink the window).
+9. Else:
+10. Update ans to be the maximum of current ans and the current window size.
+Return ans.*/
 int characterReplacementOptimal(string s, int k)
 {
     unordered_map<char, int> alphabets;
